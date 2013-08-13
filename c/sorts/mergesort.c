@@ -3,6 +3,8 @@
 #include <string.h> // memcpy
 #include <time.h>
 
+// gcc -std=c99 -o mergesort mergesort.c && ./mergesort
+
 #define RANGE 100
 #define SIZE 10
 
@@ -45,8 +47,7 @@ void merge_sort(int *arr, int len)
 
 int sorted(int *buf, int len)
 {
-    int i;
-    for (i = 1; i < len; i++) {
+    for (int i = 1; i < len; i++) {
         if (buf[i - 1] > buf[i]) return 0;
     }
 
