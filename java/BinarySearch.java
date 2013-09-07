@@ -1,9 +1,16 @@
-import java.util.Arrays;
-import java.util.Random;
+/**
+ * Binary Search implementation.
+ */
+public class BinarySearch<T extends Comparable<T>> {
 
-public class BinarySearch {
-
-    public static int search(int key, int[] arr)
+    /**
+     * Locate the key's index in supplied array.
+     *
+     * @param  key The key to locate.
+     * @param  arr The array to search.
+     * @return     The key's index, -1 if unsuccessful.
+     */
+    public int search(T key, T[] arr)
     {
         int l = 0;
         int h = arr.length - 1;
@@ -11,9 +18,9 @@ public class BinarySearch {
         while (l <= h) {
             int m = l + (h - l) / 2;
 
-            if (key < arr[m]) {
+            if (key.compareTo(arr[m]) < 0) {
                 h = m - 1;
-            } else if (key > arr[m]) {
+            } else if (key.compareTo(arr[m]) > 0) {
                 l = m + 1;
             } else {
                 return m;
@@ -25,25 +32,13 @@ public class BinarySearch {
 
     public static void main(String[] args)
     {
-        int[] arr = new int[10];
+        BinarySearch<String> instance = new BinarySearch<String>();
 
-        Random random = new Random();
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = random.nextInt(20) + 1; // 1..20
-        }
+        String[] places = new String[] { "London", "Paris", "Tokyo" };
 
-        Arrays.sort(arr);
+        System.out.println("Paris is a place: "  + (instance.search("Paris", places) > -1 ? "Yes" : "No"));
 
-        for (int ele : arr) System.out.print(ele + " ");
-        System.out.println();
-
-        int num = (args.length > 1)
-            ? Integer.parseInt(args[1])
-            : arr[arr.length / 2]; // middle element
-
-        boolean exists = search(num, arr) != -1;
-
-        System.out.println("Contains the value " + num + ": " + ((exists) ? "Yes" : "No"));
+        System.out.println("Cheese is a place: " + (instance.search("Cheese", places) > -1 ? "Yes" : "No"));
     }
 
 }
