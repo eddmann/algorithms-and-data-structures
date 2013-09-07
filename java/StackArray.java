@@ -1,5 +1,5 @@
 /**
- * Stack, implemented using a resizing array.
+ * Stack, implemented using a resizing array (LIFO).
  */
 public class StackArray<T> {
 

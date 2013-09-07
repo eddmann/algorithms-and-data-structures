@@ -1,5 +1,5 @@
 /**
- * Stack, implemented using a linked-list.
+ * Stack, implemented using a linked-list (LIFO).
  */
 public class StackLinkedList<T> {
 
@@ -47,7 +47,7 @@ public class StackLinkedList<T> {
     }
 
     /**
-     * Pop an element of the stack.
+     * Pop an element off the stack.
      *
      * @return The popped element.
      */
