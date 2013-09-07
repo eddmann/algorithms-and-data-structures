@@ -1,7 +1,7 @@
 /**
  * Binary Search implementation.
  */
-public class BinarySearch<T extends Comparable<T>> {
+public class BinarySearch {
 
     /**
      * Locate the key's index in supplied array.
@@ -10,7 +10,7 @@ public class BinarySearch<T extends Comparable<T>> {
      * @param  arr The array to search.
      * @return     The key's index, -1 if unsuccessful.
      */
-    public int search(T key, T[] arr)
+    public static int search(Comparable key, Comparable[] arr)
     {
         int l = 0;
         int h = arr.length - 1;
@@ -32,13 +32,11 @@ public class BinarySearch<T extends Comparable<T>> {
 
     public static void main(String[] args)
     {
-        BinarySearch<String> instance = new BinarySearch<String>();
-
         String[] places = new String[] { "London", "Paris", "Tokyo" };
 
-        System.out.println("Paris is a place: "  + (instance.search("Paris", places) > -1 ? "Yes" : "No"));
+        System.out.println("Paris is a place: "  + (search("Paris", places) > -1 ? "Yes" : "No"));
 
-        System.out.println("Cheese is a place: " + (instance.search("Cheese", places) > -1 ? "Yes" : "No"));
+        System.out.println("Cheese is a place: " + (search("Cheese", places) > -1 ? "Yes" : "No"));
     }
 
 }
