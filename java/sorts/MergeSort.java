@@ -1,6 +1,21 @@
+/**
+ * Merge Sort implementation, using natural ordering.
+ *
+ * Worst Case: O(n log n)
+ */
 public class MergeSort {
 
-    public static void merge(Comparable[] arr, Comparable[] tmp, int l, int m, int h)
+    /**
+     * Merge routine.
+     *
+     * @param  arr Array to sort.
+     * @param  tmp Auxiliary array.
+     * @param  l   Low index bounds.
+     * @param  m   Middle index bounds.
+     * @param  h   High index bounds.
+     * @return     void
+     */
+    private static void merge(Comparable[] arr, Comparable[] tmp, int l, int m, int h)
     {
         // copy current order into temp array.
         for (int i = l; i <= h; i++) {
@@ -26,6 +41,15 @@ public class MergeSort {
         }
     }
 
+    /**
+     * Sort routine, with temporary array supplied.
+     *
+     * @param  arr Array to sort.
+     * @param  tmp Auxiliary array.
+     * @param  l   Low index bounds.
+     * @param  h   High index bounds.
+     * @return     void
+     */
     public static void sort(Comparable[] arr, Comparable[] tmp, int l, int h)
     {
         // return if 0..1
@@ -41,6 +65,12 @@ public class MergeSort {
         merge(arr, tmp, l, m, h);
     }
 
+    /**
+     * Sort routine.
+     *
+     * @param  arr Array to sort.
+     * @return     void
+     */
     public static void sort(Comparable[] arr)
     {
         Comparable[] tmp = new Comparable[arr.length];

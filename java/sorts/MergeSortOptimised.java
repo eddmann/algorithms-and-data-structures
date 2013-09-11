@@ -1,5 +1,20 @@
+/**
+ * Merge Sort implementation, including 'ordered skip' and 'merge copy skip' optimisations.
+ *
+ * Worst Case: O(n log n)
+ */
 public class MergeSortOptimised {
 
+    /**
+     * Merge routine.
+     *
+     * @param  src Source array.
+     * @param  dst Destination array.
+     * @param  l   Low index bounds.
+     * @param  m   Middle index bounds.
+     * @param  h   High index bounds.
+     * @return     void
+     */
     private static void merge(Comparable[] src, Comparable[] dst, int l, int m, int h)
     {
         int i = l, j = m + 1;
@@ -16,6 +31,15 @@ public class MergeSortOptimised {
         }
     }
 
+    /**
+     * Sort routine, with temporary array supplied.
+     *
+     * @param  src Source array.
+     * @param  dst Destination array.
+     * @param  l   Low index bounds.
+     * @param  h   High index bounds.
+     * @return     void
+     */
     public static void sort(Comparable[] src, Comparable[] dst, int l, int h)
     {
         if (l >= h) {
@@ -38,6 +62,12 @@ public class MergeSortOptimised {
         }
     }
 
+    /**
+     * Sort routine.
+     *
+     * @param  arr Array to sort.
+     * @return     void
+     */
     public static void sort(Comparable[] arr)
     {
         Comparable[] tmp = new Comparable[arr.length];
