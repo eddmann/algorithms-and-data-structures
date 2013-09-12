@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Merge Sort implementation, including 'ordered skip' and 'merge copy skip' optimisations.
  *
@@ -81,17 +83,13 @@ public class MergeSortOptimised {
 
     public static void main(String[] args)
     {
-        String[] alphabet = new String[] { "d", "c", "a", "b" };
+        String[] alpha = new String[] { "b", "a", "d", "c" };
 
-        System.out.print("Before: ");
-        for (String a : alphabet) System.out.print(a + " ");
-        System.out.println();
+        System.out.println("Before: " + Arrays.toString(alpha));
 
-        sort(alphabet);
+        sort(alpha);
 
-        System.out.print("After: ");
-        for (String a : alphabet) System.out.print(a + " ");
-        System.out.println();
+        System.out.println("After: " + Arrays.toString(alpha));
     }
 
 }

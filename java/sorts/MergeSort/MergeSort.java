@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Merge Sort implementation, using natural ordering.
  *
@@ -79,17 +81,13 @@ public class MergeSort {
 
     public static void main(String[] args)
     {
-        String[] alphabet = new String[] { "b", "a", "d", "c" };
+        String[] alpha = new String[] { "b", "a", "d", "c" };
 
-        System.out.print("Before: ");
-        for (String a : alphabet) System.out.print(a + " ");
-        System.out.println();
+        System.out.println("Before: " + Arrays.toString(alpha));
 
-        sort(alphabet);
+        sort(alpha);
 
-        System.out.print("After: ");
-        for (String a : alphabet) System.out.print(a + " ");
-        System.out.println();
+        System.out.println("After: " + Arrays.toString(alpha));
     }
 
 }

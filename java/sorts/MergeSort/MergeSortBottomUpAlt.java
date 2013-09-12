@@ -1,11 +1,6 @@
-public class MergeSortBottomUpAlt {
+import java.util.Arrays;
 
-    private static void print(String lbl, int[] N)
-    {
-        System.out.print(lbl + ": ");
-        for (int n : N) System.out.print(n + " ");
-        System.out.print("\n");
-    }
+public class MergeSortBottomUpAlt {
 
     private static void merge(int[] arr, int l, int m, int h)
     {
@@ -61,9 +56,13 @@ public class MergeSortBottomUpAlt {
 
     public static void main(String[] args)
     {
-        int[] N = new int[] { 4, 3, 1, 2 };
+        int[] N = new int[] { 5, 3, 2, 6 };
+
+        System.out.println("Before: " + Arrays.toString(N));
+
         sort(N);
-        print("Sorted", N);
+
+        System.out.println("After: " + Arrays.toString(N));
     }
 
 }

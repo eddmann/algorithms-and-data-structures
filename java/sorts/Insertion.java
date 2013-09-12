@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Insertion sort implementation, using natural ordering.
  *
@@ -21,19 +23,13 @@ public class Insertion {
 
     public static void main(String[] args)
     {
-        String[] alphabet = new String[] { "b", "c", "a", "e", "d" };
+        String[] alpha = new String[] { "b", "c", "a", "e", "d" };
 
-        for (String alpha : alphabet) {
-            System.out.print(alpha + " ");
-        }
-        System.out.println();
+        System.out.println("Before: " + Arrays.toString(alpha));
 
-        sort(alphabet);
+        sort(alpha);
 
-        for (String alpha : alphabet) {
-            System.out.print(alpha + " ");
-        }
-        System.out.println();
+        System.out.println("After: " + Arrays.toString(alpha));
     }
 
 }
