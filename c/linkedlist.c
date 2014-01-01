@@ -39,7 +39,7 @@ int delete(bool from_tail)
         int item = ptr->next->item;
         tail = ptr;
         free(tail->next);
-        tail->next= NULL;
+        tail->next = NULL;
         ptr = NULL;
         return item;
     } else {
