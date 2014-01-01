@@ -38,7 +38,7 @@ int delete(bool from_tail)
         struct node* ptr = tail;
         int item = ptr->item;
         tail = ptr->prev;
-        if (tail == NULL) head = tail;
+        if (NULL == tail) head = tail;
         else tail->next = NULL;
         free(ptr);
         ptr = NULL;
@@ -47,7 +47,7 @@ int delete(bool from_tail)
         struct node* ptr = head;
         int item = ptr->item;
         head = ptr->next;
-        if (head == NULL) tail = head;
+        if (NULL == head) tail = head;
         else head->prev = NULL;
         free(ptr);
         ptr = NULL;

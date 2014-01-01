@@ -46,7 +46,7 @@ int delete(bool from_tail)
         struct node *ptr = head;
         int item = ptr->item;
         head = ptr->next;
-        if (head == NULL) tail = head;
+        if (NULL == head) tail = head;
         free(ptr);
         ptr = NULL;
         return item;
