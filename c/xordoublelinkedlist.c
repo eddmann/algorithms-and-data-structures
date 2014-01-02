@@ -37,6 +37,31 @@ void insert(int item, bool at_tail)
     }
 }
 
+int delete(bool from_tail)
+{
+    if (NULL == head) {
+        return -1;
+    } else if (from_tail) {
+        node *ptr = tail;
+        int item = ptr->item;
+        node *prev = xor(ptr->np, NULL);
+        prev->np = xor(ptr, xor(prev->np, NULL));
+        tail = prev;
+        free(ptr);
+        ptr = NULL;
+        return item;
+    } else {
+        node *ptr = head;
+        int item = ptr->item;
+        node *next = xor(NULL, ptr->np);
+        next->np = xor(ptr, xor(NULL, next->np));
+        head = next;
+        free(ptr);
+        ptr = NULL;
+        return item;
+    }
+}
+
 void list()
 {
     node *curr = head;
@@ -58,5 +83,10 @@ int main()
     for (int i = 1; i <= 10; i++)
         insert(i, i < 6);
 
-    list();
+    list(); // 10 9 8 7 6 1 2 3 4 5
+
+    for (int i = 1; i <= 4; i++)
+        delete(i < 3);
+
+    list(); // 8 7 6 1 2 3
 }
