@@ -35,9 +35,7 @@ public class BinaryHeap<T extends Comparable<T>> {
 
     private boolean compare(int a, int b)
     {
-        return (max)
-            ? arr[a].compareTo(arr[b]) < 0
-            : arr[a].compareTo(arr[b]) > 0;
+        return arr[max ? b : a].compareTo(arr[max ? a : b]) > 0;
     }
 
     public void add(T ele)
@@ -90,7 +88,7 @@ public class BinaryHeap<T extends Comparable<T>> {
 
     public static void main(final String[] args)
     {
-        BinaryHeap<Integer> heap = new BinaryHeap<>(true);
+        BinaryHeap<Integer> heap = new BinaryHeap<>();
 
         for (int i = 0; i < 10; i++)
             heap.add(i);
