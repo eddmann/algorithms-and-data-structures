@@ -4,14 +4,16 @@
 
 // clear && gcc doublylinkedlist.c -o doublylinkedlist && ./doublylinkedlist && rm ./doublylinkedlist
 
-struct node {
+typedef struct node {
     int item;
     struct node *prev, *next;
-} *head, *tail;
+} node;
 
-struct node* insert(int item, bool at_tail)
+node *head, *tail;
+
+void insert(int item, bool at_tail)
 {
-    struct node *ptr = (struct node*) malloc(sizeof(struct node));
+    node *ptr = (node*) malloc(sizeof(node));
     ptr->item = item;
     ptr->prev = ptr->next = NULL;
 
@@ -26,16 +28,15 @@ struct node* insert(int item, bool at_tail)
         head->prev = ptr;
         head = ptr;
     }
-
-    return ptr;
 }
 
 int delete(bool from_tail)
 {
     if (NULL == head) {
-        return -1;
+        printf("Empty list.\n");
+        exit(1);
     } else if (from_tail) {
-        struct node* ptr = tail;
+        node *ptr = tail;
         int item = ptr->item;
         tail = ptr->prev;
         if (NULL == tail) head = tail;
@@ -44,7 +45,7 @@ int delete(bool from_tail)
         ptr = NULL;
         return item;
     } else {
-        struct node* ptr = head;
+        node *ptr = head;
         int item = ptr->item;
         head = ptr->next;
         if (NULL == head) tail = head;
@@ -57,7 +58,7 @@ int delete(bool from_tail)
 
 void list()
 {
-    struct node *ptr = head;
+    node *ptr = head;
 
     while (NULL != ptr) {
         printf("%d ", ptr->item);
@@ -67,7 +68,7 @@ void list()
     printf("\n");
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     for (int i = 1; i <= 10; i++)
         insert(i, i < 6);
