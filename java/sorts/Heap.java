@@ -1,19 +1,17 @@
 public class Heap {
 
-    private static Comparable[] arr;
+    // http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/Sorting/heapSort.htm
 
     private static int total;
 
-    private static void buildHeap(Comparable[] input)
+    private static void swap(Comparable[] arr, int a, int b)
     {
-        arr = input;
-        total = arr.length - 1;
-        for (int i = total / 2; i >= 0; i--) {
-            maxHeap(i);
-        }
+        Comparable tmp = arr[a];
+        arr[a] = arr[b];
+        arr[b] = tmp;
     }
 
-    private static void maxHeap(int i)
+    private static void heapify(Comparable[] arr, int i)
     {
         int lft = i * 2;
         int rgt = lft + 1;
@@ -22,32 +20,30 @@ public class Heap {
         if (lft <= total && arr[lft].compareTo(arr[grt]) > 0) grt = lft;
         if (rgt <= total && arr[rgt].compareTo(arr[grt]) > 0) grt = rgt;
         if (grt != i) {
-            swap(i, grt);
-            maxHeap(grt);
+            swap(arr, i, grt);
+            heapify(arr, grt);
         }
     }
 
-    private static void swap(int a, int b)
+    public static void sort(Comparable[] arr)
     {
-        Comparable tmp = arr[a];
-        arr[a] = arr[b];
-        arr[b] = tmp;
-    }
+        total = arr.length - 1;
 
-    public static void sort(Comparable[] input)
-    {
-        buildHeap(input);
+        for (int i = total / 2; i >= 0; i--)
+            heapify(arr, i);
 
         for (int i = total; i > 0; i--) {
-            swap(0, i);
+            swap(arr, 0, i);
             total--;
-            maxHeap(0);
+            heapify(arr, 0);
         }
     }
 
     public static void main(final String[] args)
     {
-        Integer[] arr = new Integer[] { 1, 4, 3, 2, 8 };
+        Integer[] arr = new Integer[] { 3, 2, 1, 5, 4 };
+
+        System.out.println(java.util.Arrays.toString(arr));
         sort(arr);
         System.out.println(java.util.Arrays.toString(arr));
     }
