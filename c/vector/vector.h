@@ -1,5 +1,5 @@
-#ifndef VECTOR_H__
-#define VECTOR_H__
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #define VECTOR_INIT_CAPACITY 1
 
