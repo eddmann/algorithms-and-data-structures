@@ -29,9 +29,24 @@ class Node implements Comparable<Node> {
         return moves;
     }
 
+    public int getScore()
+    {
+        return board.hammingDistance() + moves;
+    }
+
+    public boolean isBoardGoal()
+    {
+        return board.isGoal();
+    }
+
+    public Iterable<Board> getBoardNeighbors()
+    {
+        return board.getNeighbors();
+    }
+
     public int compareTo(Node that)
     {
-        return (board.hammingDistance() + moves) - (that.getBoard().hammingDistance() + that.getMoves());
+        return this.getScore() - that.getScore();
     }
 
 }
