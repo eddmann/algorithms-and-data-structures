@@ -19,7 +19,7 @@ class Puzzle {
                 break;
             }
 
-            Iterable<Board> neighbors = node.getBoard().getNeighbors();
+            Iterable<Board> neighbors = node.getBoardNeighbors();
 
             for (Board board : neighbors) {
                 if ((node.getParent() != null && ! board.equals(node.getParent().getBoard())) ||
