@@ -3,8 +3,6 @@
 
 #include "vector.h"
 
-// #define PRINT_DEBUG
-
 void vector_init(vector *v)
 {
     v->capacity = VECTOR_INIT_CAPACITY;
@@ -19,7 +17,7 @@ int vector_total(vector *v)
 
 static void vector_resize(vector *v, int capacity)
 {
-    #ifdef PRINT_DEBUG
+    #ifdef DEBUG_ON
     printf("vector_resize: %d to %d\n", v->capacity, capacity);
     #endif
 

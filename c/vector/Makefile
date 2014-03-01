@@ -1,14 +1,22 @@
-all: vector
+CC=gcc
+CFLAGS=
+RM=rm -rf
+OUT=vector
 
-vector: main.o vector.o
-	gcc main.o vector.o -o vector
-	rm -rf *o
+all: build
+
+build: main.o vector.o
+    $(CC) $(CFLAGS) -o $(OUT) main.c vector.c
+    $(RM) *.o
+
+debug: CFLAGS+=-DDEBUG_ON
+debug: build
 
 main.o: main.c vector.h
-	gcc -c main.c
+    $(CC) $(CFLAGS) -c main.c
 
 vector.o: vector.c vector.h
-	gcc -c vector.c
+    $(CC) $(CFLAGS) -c vector.c
 
 clean:
-	rm -rf *o vector
+    $(RM) *.o $(OUT)
