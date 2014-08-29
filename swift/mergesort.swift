@@ -67,3 +67,45 @@ func sort<T>(arr: [T], pred: (T, T) -> Bool) -> [T] {
 }
 
 println(sort([1, 2, 3, 4, 5], { $0 > $1 }))
+
+extension Array {
+    func slice(min: Int, _ max: Int) -> [T] {
+        return Array(self[min ..< max])
+    }
+    
+    var head: T {
+        return self[0]
+    }
+
+    var tail: [T] {
+        return self.slice(1, self.count)
+    }
+
+    func split() -> ([T], [T]) {
+        let mid = self.count / 2
+        return (slice(0, mid), slice(mid, self.count))
+    }
+}
+
+func merge_<T>(lft: [T], rgt: [T], pred: (T, T) -> Bool) -> [T] {
+    if lft.isEmpty {
+        return rgt
+    } else if rgt.isEmpty {
+        return lft
+    } else if pred(lft.head, rgt.head) {
+        return [ lft.head ] + merge_(lft.tail, rgt, pred)
+    } else {
+        return [ rgt.head ] + merge_(lft, rgt.tail, pred)
+    }
+}
+
+func sort_<T>(arr: [T], pred: (T, T) -> Bool) -> [T] {
+    if (arr.count > 1) {
+        let (lft, rgt) = arr.split()
+        return merge_(sort_(lft, pred), sort_(rgt, pred), pred)
+    }
+
+    return arr
+}
+
+println(sort_([1, 2, 3, 4, 5], { $0 > $1 }))
