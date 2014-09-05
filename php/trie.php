@@ -4,14 +4,14 @@ class Trie implements \Countable
 {
     private $value = null;
     private $isValue = false;
-    private $nodes = [];
+    private $nodes = array();
 
     public function insert($key, $value)
     {
         if ($head = $this->head($key)) {
             $node = isset($this->nodes[$head])
                 ? $this->nodes[$head]
-                : new self();
+                : new self;
 
             if ($tail = $this->tail($key)) {
                 $node->insert($tail, $value);
@@ -55,7 +55,7 @@ class Trie implements \Countable
                     $node->clearValue();
                 }
 
-                if (count($this) === 0) {
+                if (count($node) === 0) {
                     unset($this->nodes[$head]);
                 }
             }
@@ -95,8 +95,8 @@ class Trie implements \Countable
     private function buildKeys($prefix)
     {
         $result = $this->isValue
-            ? [ $prefix ]
-            : [];
+            ? array($prefix)
+            : array();
 
         foreach ($this->nodes as $key => $node) {
             $result = array_merge($result, $node->buildKeys($prefix . $key));
