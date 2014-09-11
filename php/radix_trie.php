@@ -14,132 +14,175 @@ class Node implements \Countable
 
     public function insert($key, $value)
     {
-        $keyLen = strlen($key);
-        $nodeKeyLen = strlen($this->key);
-        $maxPrefixLen = $this->maxKeyPrefixLength($key);
+        list($keyLen, $nodeKeyLen, $maxPrefixLen) = $this->keyLengths($key);
 
         $remainingKey = substr($key, $maxPrefixLen);
         $remainingNodeKey = substr($this->key, $maxPrefixLen);
 
-        if ($exactMatch = $keyLen === $maxPrefixLen && $nodeKeyLen === $maxPrefixLen) {
-            $this->value = $value;
-            $this->isValue = true;
+        if ($this->isExactMatch($keyLen, $nodeKeyLen, $maxPrefixLen)) {
+            $this->setValue($value);
         }
-
-        else if ($maxPrefixLen === 0 || $keyLargerThanNodeKey = $maxPrefixLen < $keyLen && $maxPrefixLen >= $nodeKeyLen) {
+        else if ($this->isNoMatch($maxPrefixLen) || $this->isNodeKeyPrefix($keyLen, $nodeKeyLen, $maxPrefixLen)) {
             foreach ($this->children as $child) {
                 if ($child->key[0] === $remainingKey[0]) {
-                    return $child->insert($remainingKey, $value);
+                    $child->insert($remainingKey, $value);
+                    return;
                 }
             }
 
-            $this->children[] = Node::createWithValue($remainingKey, $value);
+            $this->addChildNode($remainingKey, $value);
         }
-
-        else if ($shareKeyPrefixSplit = $maxPrefixLen < $nodeKeyLen) {
+        else if ($this->isSharedKeyPrefix($nodeKeyLen, $maxPrefixLen)) {
             $this->key = substr($this->key, 0, $maxPrefixLen);
-            $this->children = [ Node::createWithValue($remainingNodeKey, $this->value) ];
+            $this->children = [];
+            $this->addChildNode($remainingNodeKey, $this->value);
 
             if ($maxPrefixLen === $keyLen) {
-                $this->value = $value;
-                $this->isValue = true;
+                $this->setValue($value);
             } else {
-                $this->children[] = Node::createWithValue($remainingKey, $value);
-                $this->value = null;
-                $this->isValue = false;
+                $this->clearValue();
+                $this->addChildNode($remainingKey, $value);
             }
         }
-
-        else {
-            $this->children[] = Node::createWithValue($remainingKey, $value);
-        }
     }
 
-    private function maxKeyPrefixLength($str)
+    private function keyLengths($key)
     {
-        $len = 0;
+        $maxPrefixLen = function() use($key) {
+            $l = 0;
+            for ($i = 0; $i < min(strlen($this->key), strlen($key)); $i++) {
+                if ($this->key[$i] != $key[$i]) break;
+                $l++;
+            }
+            return $l;
+        };
 
-        for ($i = 0; $i < min(strlen($this->key), strlen($str)); $i++) {
-            if ($this->key[$i] != $str[$i]) break;
-            $len++;
-        }
-
-        return $len;
+        return [ strlen($key), strlen($this->key), $maxPrefixLen() ];
     }
 
-    private static function createWithValue($key, $value)
+    private function isExactMatch($keyLen, $nodeKeyLen, $maxPrefixLen)
     {
-        $n = new self($key);
-        $n->value = $value;
-        $n->isValue = true;
-        return $n;
+        return $keyLen === $maxPrefixLen && $nodeKeyLen === $maxPrefixLen;
+    }
+
+    private function setValue($value)
+    {
+        $this->value = $value;
+        $this->isValue = true;
+    }
+
+    private function isNoMatch($maxPrefixLen)
+    {
+        return $maxPrefixLen === 0;
+    }
+
+    private function isNodeKeyPrefix($keyLen, $nodeKeyLen, $maxPrefixLen)
+    {
+        return $maxPrefixLen >= $nodeKeyLen && $maxPrefixLen < $keyLen;
+    }
+
+    private function addChildNode($key, $value)
+    {
+        $child = new self($key);
+        $child->setValue($value);
+        $this->children[] = $child;
+    }
+
+    private function isSharedKeyPrefix($nodeKeyLen, $maxPrefixLen)
+    {
+        return $maxPrefixLen < $nodeKeyLen;
+    }
+
+    private function clearValue()
+    {
+        $this->value = null;
+        $this->isValue = false;
     }
 
     public function remove($key)
     {
         foreach ($this->children as $i => $child) {
-            $keyLen = strlen($key);
-            $nodeLen = strlen($child->key);
-            $maxPrefixLen = $child->maxKeyPrefixLength($key);
+            list($keyLen, $nodeKeyLen, $maxPrefixLen) = $this->keyLengths($key);
 
-            if ($exactMatch = $keyLen === $maxPrefixLen && $nodeLen === $maxPrefixLen) {
-                if (count($child->children) === 0) {
-                    unset($this->children[$i]);
-                    return;
-                }
+            $isExactMatch = $this->isExactMatch($keyLen, $nodeKeyLen, $maxPrefixLen);
 
-                else if ($child->isValue) {
-                    $child->value = null;
-                    $child->isValue = false;
-
-                    if (count($child->children) === 1) {
-                        $subChild = $child->children[0];
-
-                        $child->key = $child->key . $subChild->key;
-                        $child->value = $subChild->value;
-                        $child->isValue = $subChild->isValue;
-                        $child->children = [];
-                    }
-
-                    return;
-                }
+            if ($isExactMatch && count($child->children) === 0) {
+                unset($this->children[$i]);
+                break;
             }
+            else if ($isExactMatch && $child->isValue) {
+                $child->clearValue();
 
-            else if ($traverseChildNode = $maxPrefixLen > 0 && $maxPrefixLen < $keyLen) {
-                return $this->remove(substr($key, $maxPrefixLen));
+                if (count($child->children) === 1) {
+                    $this->mergeParentAndChildNode($child);
+                }
+
+                break;
+            }
+            else if ($this->isKeyPrefix($keyLen, $maxPrefixLen)) {
+                $this->remove(substr($key, $maxPrefixLen));
+                break;
             }
         }
     }
 
-    public function getValue($key)
+    private function mergeParentAndChildNode(Node $p)
     {
-        if ($node = $this->get($key)) {
-            return $node->value;
-        }
-
-        throw new Exception;
+        $c = $p->children[0];
+        $p->key .= $c->key;
+        $p->value = $c->value;
+        $p->isValue = $c->isValue;
+        $p->children = [];
     }
 
-    private function get($key, $currentKey = '')
+    private function isKeyPrefix($keyLen, $maxPrefixLen)
     {
-        if ($this->isValue && $key === $currentKey) {
-            return $this;
-        }
+        return $maxPrefixLen > 0 && $maxPrefixLen < $keyLen;
+    }
 
-        $keyLen = strlen($key);
-        $currentKeyLen = strlen($currentKey);
+    public function getValue($key, $acc = '')
+    {
+        if ($this->isValue && $key === $acc) {
+            return $this->value;
+        }
 
         foreach ($this->children as $child) {
-            $newPrefix = $currentKey . $child->key;
-            $newPrefixLen = strlen($newPrefix);
+            $newPrefix = $acc . $child->key;
 
-            if ($keyLen <= $currentKeyLen ||
-                $newPrefixLen <= $currentKeyLen ||
-                $newPrefix[$currentKeyLen] === $key[$currentKeyLen]
-            ) {
-                return $child->get($key, $newPrefix);
+            if ($this->isPossibleMatch($key, $acc, $newPrefix)) {
+                return $child->getValue($key, $newPrefix);
             }
         }
+    }
+
+    private function isPossibleMatch($key, $acc, $newPrefix)
+    {
+        return
+            strlen($key) <= ($l = strlen($acc)) ||
+            strlen($newPrefix) <= $l ||
+            $newPrefix[$l] === $key[$l];
+    }
+
+    public function keys($prefix = '', $acc = '')
+    {
+        $keys = $this->isKeyPrefixWithValue($prefix, $acc)
+            ? [ $acc ]
+            : [];
+
+        foreach ($this->children as $child) {
+            $newPrefix = $acc . $child->key;
+
+            if ($this->isPossibleMatch($prefix, $acc, $newPrefix)) {
+                $keys = array_merge($keys, $child->keys($prefix, $newPrefix));
+            }
+        }
+
+        return $keys;
+    }
+
+    private function isKeyPrefixWithValue($prefix, $acc)
+    {
+        return $this->isValue && ($prefix === '' || strpos($acc, $prefix) === 0);
     }
 
     public function count()
@@ -169,6 +212,11 @@ class RadixTrie implements \Countable
     public function remove($key)
     {
         $this->root->remove($key);
+    }
+
+    public function keys($prefix = '')
+    {
+        return $this->root->keys($prefix);
     }
 
     public function get($key)
