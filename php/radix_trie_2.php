@@ -41,12 +41,16 @@ class RadixTrie implements \Countable
         $this->root = new Node(null);
     }
 
-    public function insert($key, $value, Node $node = null)
+    public function insert($key, $value)
     {
-        $node = $this->nodeOrRoot($node);
+        $this->insertFromNode($key, $value, $this->root);
+    }
 
+    private function insertFromNode($key, $value, Node $node)
+    {
         list($keyLen, $nodeKeyLen, $maxPrefixLen) = $this->calcKeyLengths($key, $node);
 
+        $matchedKey = substr($key, 0, $maxPrefixLen);
         $remainingKey = substr($key, $maxPrefixLen);
         $remainingNodeKey = substr($node->key, $maxPrefixLen);
 
@@ -56,7 +60,7 @@ class RadixTrie implements \Countable
         else if ($this->isNoMatch($maxPrefixLen) || $this->isNodeKeyPrefix($keyLen, $nodeKeyLen, $maxPrefixLen)) {
             foreach ($node->children as $child) {
                 if ($child->key[0] === $remainingKey[0]) {
-                    $this->insert($remainingKey, $value, $child);
+                    $this->insertFromNode($remainingKey, $value, $child);
                     return;
                 }
             }
@@ -64,9 +68,8 @@ class RadixTrie implements \Countable
             $node->addChildNode($remainingKey, $value);
         }
         else if ($this->isSharedKeyPrefix($nodeKeyLen, $maxPrefixLen)) {
-            $node->key = substr($node->key, 0, $maxPrefixLen);
-            $node->children = [];
-            $node->addChildNode($remainingNodeKey, $node->value);
+            $node->key = $matchedKey;
+            $node->children = [ $this->cloneNodeWithKey($node, $remainingNodeKey) ];
 
             if ($maxPrefixLen === $keyLen) {
                 $node->setValue($value);
@@ -75,11 +78,6 @@ class RadixTrie implements \Countable
                 $node->addChildNode($remainingKey, $value);
             }
         }
-    }
-
-    private function nodeOrRoot($node)
-    {
-        return $node ?: $this->root;
     }
 
     private function calcKeyLengths($key, Node $node)
@@ -116,10 +114,23 @@ class RadixTrie implements \Countable
         return $maxPrefixLen < $nodeKeyLen;
     }
 
-    public function remove($key, Node $node = null)
+    private function cloneNodeWithKey(Node $n, $newKey)
     {
-        $node = $this->nodeOrRoot($node);
+        $c = new Node($newKey);
+        $c->value = $n->value;
+        $c->isValue = $n->isValue;
+        $c->children = $n->children;
 
+        return $c;
+    }
+
+    public function remove($key)
+    {
+        $this->removeFromNode($key, $this->root);
+    }
+
+    private function removeFromNode($key, Node $node)
+    {
         foreach ($node->children as $i => $child) {
             list($keyLen, $nodeKeyLen, $maxPrefixLen) = $this->calcKeyLengths($key, $child);
 
@@ -139,7 +150,7 @@ class RadixTrie implements \Countable
                 break;
             }
             else if ($this->isKeyPrefix($keyLen, $maxPrefixLen)) {
-                $this->remove(substr($key, $maxPrefixLen), $child);
+                $this->removeFromNode(substr($key, $maxPrefixLen), $child);
                 break;
             }
         }
@@ -159,46 +170,52 @@ class RadixTrie implements \Countable
         return $maxPrefixLen > 0 && $maxPrefixLen < $keyLen;
     }
 
-    public function get($key, $acc = '', Node $node = null)
+    public function getValue($key)
     {
-        $node = $this->nodeOrRoot($node);
+        return $this->getValueFromNode($key, '', $this->root);
+    }
 
-        if ($node->isValue && $key === $acc) {
+    private function getValueFromNode($key, $currKey, Node $node)
+    {
+        if ($node->isValue && $key === $currKey) {
             return $node->value;
         }
 
         foreach ($node->children as $child) {
-            $newPrefix = $acc . $child->key;
+            $newPrefix = $currKey . $child->key;
 
-            if ($this->isPossibleMatch($key, $acc, $newPrefix)) {
-                return $this->get($key, $newPrefix, $child);
+            if ($this->isPossibleMatch($key, $currKey, $newPrefix)) {
+                return $this->getValueFromNode($key, $newPrefix, $child);
             }
         }
 
         throw new OutOfBoundsException("Key '$key' does not exist.");
     }
 
-    private function isPossibleMatch($key, $acc, $newPrefix)
+    private function isPossibleMatch($key, $currKey, $newPrefix)
     {
         return
-            strlen($key) <= ($l = strlen($acc)) ||
+            strlen($key) <= ($l = strlen($currKey)) ||
             strlen($newPrefix) <= $l ||
             $newPrefix[$l] === $key[$l];
     }
 
-    public function keys($prefix = '', $acc = '', Node $node = null)
+    public function getKeysWithPrefix($prefix)
     {
-        $node = $this->nodeOrRoot($node);
+        return $this->getKeysFromNode($prefix, '', $this->root);
+    }
 
-        $keys = $this->isKeyPrefixWithValue($node, $prefix, $acc)
-            ? [ $acc ]
+    private function getKeysFromNode($prefix = '', $currPrefix, Node $node)
+    {
+        $keys = $this->isKeyPrefixWithValue($node, $prefix, $currPrefix)
+            ? [ $currPrefix ]
             : [];
 
         foreach ($node->children as $child) {
-            $newPrefix = $acc . $child->key;
+            $newPrefix = $currPrefix . $child->key;
 
-            if ($this->isPossibleMatch($prefix, $acc, $newPrefix)) {
-                $keys = array_merge($keys, $this->keys($prefix, $newPrefix, $child));
+            if ($this->isPossibleMatch($prefix, $currPrefix, $newPrefix)) {
+                $keys = array_merge($keys, $this->getKeysFromNode($prefix, $newPrefix, $child));
             }
         }
 
@@ -210,14 +227,40 @@ class RadixTrie implements \Countable
         return $node->isValue && ($prefix === '' || strpos($acc, $prefix) === 0);
     }
 
-    public function count(Node $node = null)
+    public function getKeys()
     {
-        $node = $this->nodeOrRoot($node);
+        return $this->getKeysFromNode('', '', $this->root);
+    }
 
+    public function count()
+    {
+        return $this->countFromNode($this->root);
+    }
+
+    private function countFromNode(Node $node)
+    {
         return array_reduce(
             $node->children,
-            function($acc, Node $n) { return $acc + $this->count($n); },
+            function($acc, Node $n) { return $acc + $this->countFromNode($n); },
             $node->isValue ? 1 : 0
         );
     }
 }
+
+$t = new RadixTrie;
+
+$t->insert('romane', 1);
+$t->insert('romanus', 2);
+$t->insert('romulus', 3);
+$t->insert('rubens', 4);
+$t->insert('ruber', 5);
+$t->insert('rubicon', 6);
+$t->insert('rubicundus', 7);
+
+var_dump($t->getValue('romulus'));
+var_dump($t->getKeys());
+var_dump($t->getKeysWithPrefix('rubi'));
+$t->remove('romulus');
+
+var_dump($t);
+var_dump(count($t));
