@@ -4,6 +4,7 @@ namespace BinaryTree;
 
 require_once(__DIR__ . '/Mutable.php');
 require_once(__DIR__ . '/Immutable.php');
+require_once(__DIR__ . '/Traversal.php');
 
 function Node($value, $left = null, $right = null)
 {
@@ -19,6 +20,15 @@ function fromArray(array $values)
     }
 
     return $tree;
+}
+
+function fromArrayRep(array $values)
+{
+    return Node(
+        $values[0],
+        isset($values[1]) ? fromArrayRep($values[1]) : null,
+        isset($values[2]) ? fromArrayRep($values[2]) : null
+    );
 }
 
 function render($root, $depth = 0)
