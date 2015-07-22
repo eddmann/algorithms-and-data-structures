@@ -11,12 +11,12 @@ function Node($value, $left = null, $right = null)
     return (object) compact('value', 'left', 'right');
 }
 
-function fromArray(array $values)
+function fromArray(array $values, callable $insert)
 {
     $tree = null;
 
     foreach ($values as $value) {
-        $tree = Mutable\insert($value, $tree);
+        $tree = $insert($value, $tree);
     }
 
     return $tree;
