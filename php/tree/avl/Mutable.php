@@ -2,8 +2,12 @@
 
 namespace BinaryTree\AVL\Mutable;
 
-use function \BinaryTree\AVL\Node;
 use function \BinaryTree\minValue;
+
+function Node($value, $height = 1, $left = null, $right = null)
+{
+    return (object) compact('value', 'height', 'left', 'right');
+}
 
 function insert($value, $root)
 {
