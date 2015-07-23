@@ -22,10 +22,12 @@ function insert($value, $root)
     }
 
     if ($value > $root->value) {
-        return balance(Node($root->value, $root->left, insert($value, $root->right)));
+        $root = Node($root->value, $root->left, insert($value, $root->right));
+    } else {
+        $root = Node($root->value, insert($value, $root->left), $root->right);
     }
 
-    return balance(Node($root->value, insert($value, $root->left), $root->right));
+    return balance($root);
 }
 
 function remove($value, $root)
@@ -55,25 +57,25 @@ function remove($value, $root)
         $root = Node($value, $root->left, remove($value, $root->right));
     }
 
+    if ($root === null) {
+        return $root;
+    }
+
     return balance($root);
 }
 
 function balance($root)
 {
-    if ($root === null) {
-        return $root;
-    }
-
-    if ($isLeft = factor($root) > 1) {
-        if ($isDouble = factor($root->left) < -1) {
+    if (isLeftHeavy($root)) {
+        if (isRightHeavy($root->left)) {
             $root = Node($root->value, rotateLeft($root->left), $root->right);
         }
 
         return rotateRight($root);
     }
 
-    if ($isRight = factor($root) < -1) {
-        if ($isDouble = factor($root->right) > 1) {
+    if (isRightHeavy($root)) {
+        if (isLeftHeavy($root->right)) {
             $root = Node($root->value, $root->left, rotateRight($root->right));
         }
 
@@ -86,6 +88,16 @@ function balance($root)
 function factor($root)
 {
     return ($root->left->height ?? 0) - ($root->right->height ?? 0);
+}
+
+function isLeftHeavy($root)
+{
+    return factor($root) > 1;
+}
+
+function isRightHeavy($root)
+{
+    return factor($root) < -1;
 }
 
 function rotateLeft($root)

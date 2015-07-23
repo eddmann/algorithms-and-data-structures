@@ -73,16 +73,16 @@ function height($root)
 
 function balance($root)
 {
-    if ($isLeft = factor($root) > 1) {
-        if ($isDouble = factor($root->left) < 0) {
+    if (isLeftHeavy($root)) {
+        if (isRightHeavy($root->left)) {
             $root->left = rotateLeft($root->left);
         }
 
         return rotateRight($root);
     }
 
-    if ($isRight = factor($root) < -1) {
-        if ($isDouble = factor($root->right) > 0) {
+    if (isRightHeavy($root)) {
+        if (isLeftHeavy($root->right)) {
             $root->right = rotateRight($root->right);
         }
 
@@ -95,6 +95,16 @@ function balance($root)
 function factor($root)
 {
     return ($root->left->height ?? 0) - ($root->right->height ?? 0);
+}
+
+function isLeftHeavy($root)
+{
+    return factor($root) > 1;
+}
+
+function isRightHeavy($root)
+{
+    return factor($root) < -1;
 }
 
 function rotateLeft($root)
