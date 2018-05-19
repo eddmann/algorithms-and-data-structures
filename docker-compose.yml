@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  clojure:
+    build: ./clojure
+    volumes:
+      - ./clojure:/src
